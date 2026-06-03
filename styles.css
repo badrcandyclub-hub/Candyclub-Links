@@ -1,0 +1,392 @@
+/* ==========================================================================
+   CSS Variables
+   ========================================================================== */
+:root {
+    /* Colors */
+    --color-pink-soft: #FFD1DC;
+    --color-blue-soft: #AEC6CF;
+    --color-text-dark: #2c3e50;
+    --color-text-muted: #596a7b;
+    --color-white: #ffffff;
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    
+    /* Button Colors */
+    --whatsapp-green: #25D366;
+    --instapay-purple: #6A1B9A;
+    --primary-action: #ff6b81;
+    
+    /* Metrics */
+    --border-radius-lg: 24px;
+    --border-radius-md: 16px;
+    --border-radius-sm: 8px;
+    --spacing-xs: 8px;
+    --spacing-sm: 16px;
+    --spacing-md: 24px;
+    --spacing-lg: 32px;
+}
+
+/* ==========================================================================
+   Reset & Base Styles
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    color: var(--color-text-dark);
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--color-pink-soft), var(--color-blue-soft));
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    padding: var(--spacing-md);
+    line-height: 1.6;
+}
+
+/* Optional animated background effect */
+.background-animation {
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    animation: rotate 30s linear infinite;
+    z-index: -1;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    z-index: 1;
+}
+
+/* ==========================================================================
+   Glassmorphism Utilities
+   ========================================================================== */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+}
+
+.glass-button {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-dark);
+    text-decoration: none;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* ==========================================================================
+   Header Section
+   ========================================================================== */
+header {
+    text-align: center;
+}
+
+.logo-container {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    justify-content: center;
+}
+
+.logo-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--color-white);
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--primary-action);
+}
+
+header h1 {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-dark);
+}
+
+header p {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   Social Media Showcase
+   ========================================================================== */
+.social-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.social-btn {
+    font-size: 1.1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.social-btn i {
+    font-size: 1.3rem;
+}
+
+/* Social Brand Colors on Hover */
+.social-btn.instagram:hover { color: #E1306C; }
+.social-btn.facebook:hover { color: #1877F2; }
+.social-btn.tiktok:hover { color: #000000; }
+
+/* ==========================================================================
+   Smart Request Form
+   ========================================================================== */
+.request-section h2 {
+    text-align: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.request-section .subtitle {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.smart-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.smart-form input[type="text"] {
+    width: 100%;
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.5);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.smart-form input[type="text"]:focus {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+.smart-form input[type="text"]::placeholder {
+    color: #8c9eaf;
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.file-upload-label {
+    width: 100%;
+    border-style: dashed;
+    border-width: 2px;
+    color: var(--color-text-muted);
+}
+
+.primary-btn {
+    background: var(--primary-action);
+    color: var(--color-white);
+    border: none;
+    margin-top: var(--spacing-xs);
+}
+
+.primary-btn:hover {
+    background: #ff4d68;
+    color: var(--color-white);
+}
+
+.primary-btn.success {
+    background: #2ed573;
+}
+
+/* ==========================================================================
+   Quick Actions Section
+   ========================================================================== */
+.actions-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.whatsapp-btn {
+    background: var(--whatsapp-green);
+    color: var(--color-white);
+    font-size: 1.2rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-btn:hover {
+    background: #20c159;
+    color: var(--color-white);
+    box-shadow: 0 12px 30px rgba(37, 211, 102, 0.5);
+}
+
+/* InstaPay Card */
+.instapay-card {
+    text-align: center;
+    border-top: 4px solid var(--instapay-purple);
+}
+
+.instapay-header {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.instapay-logo-icon {
+    font-size: 1.8rem;
+    color: var(--instapay-purple);
+}
+
+.instapay-header h3 {
+    color: var(--instapay-purple);
+}
+
+.account-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.qr-placeholder {
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: var(--color-text-muted);
+    border: 1px solid var(--glass-border);
+}
+
+.account-name {
+    font-size: 1.1rem;
+}
+
+.copy-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.6);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--glass-border);
+}
+
+.account-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.icon-btn {
+    padding: var(--spacing-xs);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+footer {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    padding-bottom: var(--spacing-lg);
+}
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .glass-card {
+        padding: var(--spacing-md);
+    }
+    
+    .account-number {
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+}
