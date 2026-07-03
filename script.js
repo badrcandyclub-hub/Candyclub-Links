@@ -6,6 +6,54 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ==========================================================================
+    // Intelligent Dark Mode Auto-Switching & Toggle
+    // ==========================================================================
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIconSun = document.getElementById('themeIconSun');
+    const themeIconMoon = document.getElementById('themeIconMoon');
+
+    function enableDarkMode() {
+        document.body.classList.add('dark-mode');
+        if(themeIconSun && themeIconMoon) {
+            themeIconSun.style.display = 'none';
+            themeIconMoon.style.display = 'block';
+        }
+    }
+
+    function disableDarkMode() {
+        document.body.classList.remove('dark-mode');
+        if(themeIconSun && themeIconMoon) {
+            themeIconSun.style.display = 'block';
+            themeIconMoon.style.display = 'none';
+        }
+    }
+
+    // Auto-Switch based on time (6:00 PM to 6:00 AM)
+    function checkTimeAndApplyTheme() {
+        const hour = new Date().getHours();
+        // 18 is 6:00 PM, 6 is 6:00 AM
+        if (hour >= 18 || hour < 6) {
+            enableDarkMode();
+        } else {
+            disableDarkMode();
+        }
+    }
+
+    // Initialize Intelligent Dark Mode
+    checkTimeAndApplyTheme();
+
+    // Manual Toggle Overrides Auto Mode
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            if (document.body.classList.contains('dark-mode')) {
+                disableDarkMode();
+            } else {
+                enableDarkMode();
+            }
+        });
+    }
+
+    // ==========================================================================
     // File Input Name Update
     // ==========================================================================
     const fileInput = document.getElementById('productImage');
