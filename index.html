@@ -2,13 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Candy Club Hub | كاندي كلوب</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+
     <!-- Google Fonts: Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,100 +19,89 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Animated ambient background -->
-    <div class="background-animation"></div>
-    
+    <div class="background-mesh">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
     <main class="container">
         <!-- GLOBAL HEADER -->
-        <header class="glass-card fade-in-up" style="animation-delay: 0.1s;">
-            <div class="logo-container">
-                <!-- Placeholder for 3D Logo -->
-                <div class="logo-placeholder">
-                    <i class="fa-solid fa-candy-cane"></i>
-                </div>
+        <header class="glass-card animate-fade-in">
+            <div class="logo-wrapper">
+                <img src="logo.png" alt="Candy Club Logo" class="brand-logo">
             </div>
-            <h1>أهلاً بك في عالم كاندي كلوب</h1>
-            <p>اكتشف السعادة في كل قطعة</p>
+            <h1>أهلاً بك في كاندي كلوب</h1>
+            <p>حيث تكتمل سعادتك 🍭</p>
         </header>
 
-        <!-- SOCIAL MEDIA SHOWCASE -->
-        <section class="social-section fade-in-up" style="animation-delay: 0.2s;">
-            <a href="https://www.instagram.com/candyclub.eg/" target="_blank" class="glass-button social-btn instagram">
-                <i class="fa-brands fa-instagram"></i>
-                <span>انستجرام</span>
+        <!-- SOCIAL MEDIA LINKS -->
+        <section class="links-grid animate-fade-in" style="animation-delay: 0.1s;">
+            <a href="https://www.instagram.com/candyclub.eg/" target="_blank" class="glass-btn instagram-btn">
+                <div class="btn-icon"><i class="fa-brands fa-instagram"></i></div>
+                <div class="btn-text">انستجرام</div>
             </a>
-            <a href="https://www.facebook.com/CandyClubEGofficial/about?locale=ar_AR" target="_blank" class="glass-button social-btn facebook">
-                <i class="fa-brands fa-facebook-f"></i>
-                <span>فيسبوك</span>
+            <a href="https://www.tiktok.com/@candyclubegofficial?lang=ar" target="_blank" class="glass-btn tiktok-btn">
+                <div class="btn-icon"><i class="fa-brands fa-tiktok"></i></div>
+                <div class="btn-text">تيك توك</div>
             </a>
-            <a href="https://www.tiktok.com/@candyclubegofficial?lang=ar" target="_blank" class="glass-button social-btn tiktok">
-                <i class="fa-brands fa-tiktok"></i>
-                <span>تيك توك</span>
+            <a href="https://www.facebook.com/CandyClubEGofficial/about?locale=ar_AR" target="_blank" class="glass-btn facebook-btn">
+                <div class="btn-icon"><i class="fa-brands fa-facebook-f"></i></div>
+                <div class="btn-text">فيسبوك</div>
             </a>
-            <a href="https://whatsapp.com/channel/0029VamFNnoJUM2XzfZjO211" target="_blank" class="glass-button social-btn whatsapp-channel">
-                <i class="fa-brands fa-whatsapp"></i>
-                <span>قناة واتساب</span>
+            <a href="https://wa.me/201080269555" target="_blank" class="glass-btn whatsapp-btn">
+                <div class="btn-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="btn-text">اطلب عبر واتساب</div>
             </a>
         </section>
 
+        <!-- INSTAPAY SECTION -->
+        <section class="instapay-card glass-card animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="instapay-header">
+                <i class="fa-solid fa-bolt"></i>
+                <h2>الدفع عبر إنستاباي</h2>
+            </div>
+            <div class="instapay-details">
+                <p class="account-name">عبد الرحمن</p>
+                <div class="copy-box">
+                    <span class="account-number" id="accountNumber">01012440044</span>
+                    <button class="copy-btn" id="copyBtn" aria-label="Copy InstaPay Number">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <!-- SMART REQUEST FORM -->
-        <section class="request-section glass-card fade-in-up" style="animation-delay: 0.3s;">
-            <h2>اطلب اللي ناقصك</h2>
+        <section class="request-card glass-card animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="request-header">
+                <i class="fa-solid fa-box-open"></i>
+                <h2>اطلب اللي ناقصك</h2>
+            </div>
             <p class="subtitle">مش لاقي منتج معين؟ اطلبه وهنوفرهولك!</p>
             
-            <form id="productRequestForm" class="smart-form">
+            <form id="productRequestForm" class="glass-form">
                 <div class="input-group">
-                    <input type="text" id="productName" placeholder="اسم المنتج..." required>
+                    <input type="text" id="productName" placeholder="اسم المنتج اللي بتدور عليه..." required>
                 </div>
                 
                 <div class="file-upload-group">
                     <input type="file" id="productImage" class="hidden-file-input" accept="image/*">
-                    <label for="productImage" class="file-upload-label glass-button">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span id="fileName">إرفاق صورة للمنتج</span>
+                    <label for="productImage" class="file-upload-btn">
+                        <i class="fa-solid fa-image"></i>
+                        <span id="fileName">إرفاق صورة للمنتج (اختياري)</span>
                     </label>
                 </div>
                 
-                <button type="submit" id="submitBtn" class="primary-btn glass-button">
+                <button type="submit" id="submitBtn" class="submit-btn">
                     <span class="btn-text">إرسال الطلب</span>
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </form>
         </section>
 
-        <!-- QUICK ACTION BUTTONS -->
-        <section class="actions-section fade-in-up" style="animation-delay: 0.4s;">
-            <!-- WhatsApp Action -->
-            <a href="https://wa.me/201080269555" target="_blank" class="glass-button whatsapp-btn">
-                <i class="fa-brands fa-whatsapp"></i>
-                <span>تواصل معنا عبر واتساب</span>
-            </a>
-
-            <!-- InstaPay Action -->
-            <div class="instapay-card glass-card">
-                <div class="instapay-header">
-                    <i class="fa-solid fa-money-bill-transfer instapay-logo-icon"></i>
-                    <h3>الدفع عبر إنستاباي</h3>
-                </div>
-                
-                <div class="account-details">
-                    <div class="qr-placeholder">
-                        <i class="fa-solid fa-qrcode"></i>
-                    </div>
-                    <p class="account-name"><strong>اسم الحساب:</strong> كاندي كلوب</p>
-                    
-                    <div class="copy-group">
-                        <span id="accountNumber" class="account-number">01012440044</span>
-                        <button type="button" id="copyBtn" class="icon-btn glass-button" title="نسخ الرقم">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
         <footer>
-            <p>&copy; 2026 كاندي كلوب. جميع الحقوق محفوظة.</p>
+            <p>&copy; 2026 Candy Club. All rights reserved.</p>
         </footer>
     </main>
 

@@ -1,5 +1,6 @@
 /**
  * Candy Club Hub - Interactions & Form Handling
+ * Mobile-First Optimized
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,110 +10,117 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     const fileInput = document.getElementById('productImage');
     const fileNameDisplay = document.getElementById('fileName');
-    const originalFileText = fileNameDisplay.textContent;
+    const originalFileText = fileNameDisplay ? fileNameDisplay.textContent : '';
 
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files.length > 0) {
-            fileNameDisplay.textContent = this.files[0].name;
-        } else {
-            fileNameDisplay.textContent = originalFileText;
-        }
-    });
+    if (fileInput && fileNameDisplay) {
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileNameDisplay.textContent = this.files[0].name;
+                fileNameDisplay.style.color = 'var(--clr-text-main)';
+            } else {
+                fileNameDisplay.textContent = originalFileText;
+                fileNameDisplay.style.color = '';
+            }
+        });
+    }
 
     // ==========================================================================
     // Smart Request Form Submission Logic
     // ==========================================================================
     const requestForm = document.getElementById('productRequestForm');
     const submitBtn = document.getElementById('submitBtn');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnIcon = submitBtn.querySelector('i');
+    
+    if (requestForm && submitBtn) {
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnIcon = submitBtn.querySelector('i');
 
-    requestForm.addEventListener('submit', (e) => {
-        // Prevent default browser submission
-        e.preventDefault();
-        
-        // 1. Set Loading State
-        submitBtn.disabled = true;
-        btnText.textContent = 'جاري الإرسال...';
-        btnIcon.className = 'fa-solid fa-spinner fa-spin';
-        
-        // Note: Future integration point for Google Apps Script Webhook to push to Google Sheets
-        // fetch('YOUR_WEBHOOK_URL', { method: 'POST', body: new FormData(requestForm) }) ...
-        
-        // 2. Simulate Network Request (2-second delay)
-        setTimeout(() => {
-            // 3. Success State
-            submitBtn.classList.add('success');
-            btnText.textContent = 'تم الإرسال بنجاح ✅';
-            btnIcon.className = 'fa-solid fa-check';
+        requestForm.addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            // 4. Reset form inputs
-            requestForm.reset();
-            fileNameDisplay.textContent = originalFileText;
+            // Set Loading State
+            submitBtn.disabled = true;
+            btnText.textContent = 'جاري الإرسال...';
+            btnIcon.className = 'fa-solid fa-spinner fa-spin';
             
-            // 5. Restore original button state after 3 seconds
+            // Simulate Network Request (1.5s delay)
             setTimeout(() => {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('success');
-                btnText.textContent = 'إرسال الطلب';
-                btnIcon.className = 'fa-solid fa-paper-plane';
-            }, 3000);
-            
-        }, 2000);
-    });
+                // Success State
+                submitBtn.classList.add('success');
+                btnText.textContent = 'تم الإرسال بنجاح';
+                btnIcon.className = 'fa-solid fa-check';
+                
+                // Reset form
+                requestForm.reset();
+                if (fileNameDisplay) {
+                    fileNameDisplay.textContent = originalFileText;
+                    fileNameDisplay.style.color = '';
+                }
+                
+                // Restore button state after 3 seconds
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('success');
+                    btnText.textContent = 'إرسال الطلب';
+                    btnIcon.className = 'fa-solid fa-paper-plane';
+                }, 3000);
+                
+            }, 1500);
+        });
+    }
 
     // ==========================================================================
     // InstaPay Copy to Clipboard Logic
     // ==========================================================================
     const copyBtn = document.getElementById('copyBtn');
-    const accountNumber = '01012440044'; // Explicitly exact number
-    const copyIcon = copyBtn.querySelector('i');
+    
+    if (copyBtn) {
+        const accountNumber = '01012440044'; // Explicit exact number
+        const copyIcon = copyBtn.querySelector('i');
 
-    copyBtn.addEventListener('click', () => {
-        // Use the Clipboard API
-        navigator.clipboard.writeText(accountNumber).then(() => {
-            // Temporary Success State
-            const originalTitle = copyBtn.title;
+        copyBtn.addEventListener('click', () => {
+            // Provide immediate visual feedback for touch devices
+            copyBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => copyBtn.style.transform = '', 150);
+
+            // Copy Logic
+            navigator.clipboard.writeText(accountNumber).then(() => {
+                triggerCopySuccess();
+            }).catch(err => {
+                console.error('Clipboard API failed: ', err);
+                fallbackCopyTextToClipboard(accountNumber);
+            });
+        });
+
+        function triggerCopySuccess() {
+            // Apply success animation class
+            copyIcon.className = 'fa-solid fa-check success-pop';
             
-            copyBtn.title = "تم النسخ";
-            copyIcon.className = 'fa-solid fa-check copy-success-anim';
-            copyBtn.style.color = '#2ed573';
-            
-            // Revert after 2 seconds
+            // Reset after animation
             setTimeout(() => {
-                copyBtn.title = originalTitle;
                 copyIcon.className = 'fa-regular fa-copy';
-                copyBtn.style.color = ''; // Restore default
             }, 2000);
-            
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-            
-            // Fallback for older browsers
+        }
+
+        function fallbackCopyTextToClipboard(text) {
             try {
                 const textArea = document.createElement("textarea");
-                textArea.value = accountNumber;
+                textArea.value = text;
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                
                 document.body.appendChild(textArea);
+                textArea.focus();
                 textArea.select();
-                document.execCommand("copy");
+                
+                document.execCommand('copy');
                 document.body.removeChild(textArea);
-                
-                // Temporary Success State
-                const originalTitle = copyBtn.title;
-                
-                copyBtn.title = "تم النسخ";
-                copyIcon.className = 'fa-solid fa-check copy-success-anim';
-                copyBtn.style.color = '#2ed573';
-                
-                // Revert after 2 seconds
-                setTimeout(() => {
-                    copyBtn.title = originalTitle;
-                    copyIcon.className = 'fa-regular fa-copy';
-                    copyBtn.style.color = ''; // Restore default
-                }, 2000);
-            } catch(fallbackErr) {
-                alert('حدث خطأ أثناء النسخ.');
+                triggerCopySuccess();
+            } catch (err) {
+                console.error('Fallback copy failed', err);
+                alert('حدث خطأ أثناء النسخ. برجاء نسخ الرقم يدوياً.');
             }
-        });
-    });
+        }
+    }
 });
