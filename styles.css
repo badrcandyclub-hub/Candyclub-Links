@@ -501,3 +501,59 @@ footer {
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 }
+
+/* ==========================================================================
+   Mobile Adjustments
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Prevent horizontal scrolling */
+    body {
+        overflow-x: hidden;
+    }
+    
+    .container, .glass-card, .links-grid, .instapay-card, .request-card, .glass-btn {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Scale the logo */
+    .logo-wrapper {
+        width: 100%;
+        height: auto;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        margin-bottom: var(--sp-sm);
+    }
+
+    .brand-logo {
+        max-width: 180px;
+        height: auto;
+        margin: 0 auto;
+        display: block;
+    }
+
+    /* Fix overlap */
+    .container {
+        gap: var(--sp-lg);
+        padding: 0 var(--sp-xs);
+    }
+
+    .glass-card {
+        padding: var(--sp-lg) var(--sp-sm);
+        margin-bottom: var(--sp-sm);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .links-grid {
+        gap: var(--sp-sm);
+        display: flex;
+        flex-direction: column;
+        margin-bottom: var(--sp-md);
+    }
+    
+    .glass-btn {
+        margin-bottom: var(--sp-xs);
+    }
+}
