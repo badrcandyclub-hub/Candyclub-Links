@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // InstaPay Copy to Clipboard Logic
     // ==========================================================================
     const copyBtn = document.getElementById('copyBtn');
-    const accountNumber = document.getElementById('accountNumber').textContent;
+    const accountNumber = '01012440044'; // Explicitly exact number
     const copyIcon = copyBtn.querySelector('i');
 
     copyBtn.addEventListener('click', () => {
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalTitle = copyBtn.title;
             
             copyBtn.title = "تم النسخ";
-            copyIcon.className = 'fa-solid fa-check';
+            copyIcon.className = 'fa-solid fa-check copy-success-anim';
             copyBtn.style.color = '#2ed573';
             
             // Revert after 2 seconds
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const originalTitle = copyBtn.title;
                 
                 copyBtn.title = "تم النسخ";
-                copyIcon.className = 'fa-solid fa-check';
+                copyIcon.className = 'fa-solid fa-check copy-success-anim';
                 copyBtn.style.color = '#2ed573';
                 
                 // Revert after 2 seconds
