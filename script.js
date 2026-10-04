@@ -1,9 +1,62 @@
 /**
  * Candy Club Hub - Interactions & Form Handling
- * Mobile-First Optimized
+ * Connected to Candy Club Live System & Supabase
  */
 
+const SUPABASE_URL = 'https://thqccqwdwwxitvztmigt.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_BtFyuDBE_0PcF1z8JNskuA_-04mjcpc';
+let supabaseClient = null;
+
+function getSupabase() {
+    if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: { persistSession: false }
+        });
+    }
+    return supabaseClient;
+}
+
+// In-browser lightweight image compression
+function compressImage(file, maxWidth = 450, maxHeight = 450, quality = 0.6) {
+    return new Promise((resolve) => {
+        if (!file || !file.type.startsWith('image/')) {
+            return resolve(null);
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve(dataUrl);
+            };
+            img.onerror = () => resolve(null);
+            img.src = e.target.result;
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    getSupabase();
     
     // ==========================================================================
     // Intelligent Dark Mode Auto-Switching & Toggle
@@ -31,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-Switch based on time (6:00 PM to 6:00 AM)
     function checkTimeAndApplyTheme() {
         const hour = new Date().getHours();
-        // 18 is 6:00 PM, 6 is 6:00 AM
         if (hour >= 18 || hour < 6) {
             enableDarkMode();
         } else {
@@ -58,13 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     const fileInput = document.getElementById('productImage');
     const fileNameDisplay = document.getElementById('fileName');
-    const originalFileText = fileNameDisplay ? fileNameDisplay.textContent : '';
+    const originalFileText = fileNameDisplay ? fileNameDisplay.textContent : 'إرفاق صورة للمنتج (اختياري)';
 
     if (fileInput && fileNameDisplay) {
         fileInput.addEventListener('change', function() {
             if (this.files && this.files.length > 0) {
-                fileNameDisplay.textContent = this.files[0].name;
-                fileNameDisplay.style.color = 'var(--clr-text-main)';
+                fileNameDisplay.textContent = 'تم اختيار: ' + this.files[0].name;
+                fileNameDisplay.style.color = 'var(--clr-pink)';
             } else {
                 fileNameDisplay.textContent = originalFileText;
                 fileNameDisplay.style.color = '';
@@ -73,29 +125,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // Smart Request Form Submission Logic
+    // Live Smart Request Form Submission Logic (Direct to Supabase Waitlist)
     // ==========================================================================
     const requestForm = document.getElementById('productRequestForm');
     const submitBtn = document.getElementById('submitBtn');
+    const successBox = document.getElementById('requestSuccessBox');
+    const errorBox = document.getElementById('requestErrorBox');
     
     if (requestForm && submitBtn) {
         const btnText = submitBtn.querySelector('.btn-text');
-        const btnIcon = submitBtn.querySelector('i');
+        const submitSvg = submitBtn.querySelector('.submit-svg');
 
-        requestForm.addEventListener('submit', (e) => {
+        requestForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            if (errorBox) errorBox.style.display = 'none';
+            if (successBox) successBox.style.display = 'none';
+
+            const prodName = document.getElementById('productName')?.value.trim();
+            const phone = document.getElementById('customerPhone')?.value.trim();
+            const custName = document.getElementById('customerName')?.value.trim() || 'عميل من صفحة الروابط';
+            const file = fileInput && fileInput.files && fileInput.files.length > 0 ? fileInput.files[0] : null;
+
+            if (!prodName || !phone) {
+                if (errorBox) {
+                    errorBox.textContent = 'برجاء إدخال اسم المنتج ورقم الهاتف للتواصل.';
+                    errorBox.style.display = 'block';
+                }
+                return;
+            }
+
             // Set Loading State
             submitBtn.disabled = true;
             btnText.textContent = 'جاري الإرسال...';
-            btnIcon.className = 'fa-solid fa-spinner fa-spin';
+            if (submitSvg) submitSvg.style.display = 'none';
             
-            // Simulate Network Request (1.5s delay)
-            setTimeout(() => {
+            try {
+                let imgDataUrl = null;
+                if (file) {
+                    btnText.textContent = 'جاري تجهيز الصورة...';
+                    imgDataUrl = await compressImage(file);
+                }
+
+                btnText.textContent = 'جاري تسجيل طلبك...';
+                let finalReason = 'طلب من صفحة الروابط (Hub)';
+                if (imgDataUrl) {
+                    finalReason += ' | [IMG:' + imgDataUrl + ']';
+                }
+
+                const client = getSupabase();
+                if (!client) {
+                    throw new Error('تعذر الاتصال بخدمة كاندي كلوب');
+                }
+
+                const { data, error } = await client.from('out_of_stock').insert([{
+                    customer_name: custName,
+                    phone: phone,
+                    product: prodName,
+                    reason: finalReason
+                }]);
+
+                if (error) throw error;
+
                 // Success State
                 submitBtn.classList.add('success');
-                btnText.textContent = 'تم الإرسال بنجاح';
-                btnIcon.className = 'fa-solid fa-check';
+                btnText.textContent = 'تم الإرسال بنجاح!';
+                if (successBox) {
+                    successBox.style.display = 'block';
+                    successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
                 
                 // Reset form
                 requestForm.reset();
@@ -104,15 +202,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     fileNameDisplay.style.color = '';
                 }
                 
-                // Restore button state after 3 seconds
+                // Restore button state after 4 seconds
                 setTimeout(() => {
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('success');
-                    btnText.textContent = 'إرسال الطلب';
-                    btnIcon.className = 'fa-solid fa-paper-plane';
-                }, 3000);
+                    btnText.textContent = 'إرسال طلب آخر';
+                    if (submitSvg) submitSvg.style.display = 'inline-block';
+                }, 4000);
                 
-            }, 1500);
+            } catch (err) {
+                console.error('Request error:', err);
+                submitBtn.disabled = false;
+                btnText.textContent = 'إعادة المحاولة';
+                if (submitSvg) submitSvg.style.display = 'inline-block';
+                if (errorBox) {
+                    errorBox.textContent = 'تعذر إرسال الطلب: ' + (err.message || 'يرجى التحقق من الاتصال بالإنترنت');
+                    errorBox.style.display = 'block';
+                }
+            }
         });
     }
 
@@ -126,11 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const copyIcon = copyBtn.querySelector('i');
 
         copyBtn.addEventListener('click', () => {
-            // Provide immediate visual feedback for touch devices
             copyBtn.style.transform = 'scale(0.9)';
             setTimeout(() => copyBtn.style.transform = '', 150);
 
-            // Copy Logic
             navigator.clipboard.writeText(accountNumber).then(() => {
                 triggerCopySuccess();
             }).catch(err => {
@@ -140,10 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         function triggerCopySuccess() {
-            // Apply success animation class
             copyIcon.className = 'fa-solid fa-check success-pop';
-            
-            // Reset after animation
             setTimeout(() => {
                 copyIcon.className = 'fa-regular fa-copy';
             }, 2000);
@@ -153,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
-                // Avoid scrolling to bottom
                 textArea.style.top = "0";
                 textArea.style.left = "0";
                 textArea.style.position = "fixed";
