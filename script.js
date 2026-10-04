@@ -178,12 +178,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error('تعذر الاتصال بخدمة كاندي كلوب');
                 }
 
-                const { data, error } = await client.from('out_of_stock').insert([{
+                let payload = {
                     customer_name: custName,
                     phone: phone,
                     product: prodName,
                     reason: finalReason
-                }]);
+                };
+                if (imgDataUrl) {
+                    payload.image_url = imgDataUrl;
+                }
+
+                let { data, error } = await client.from('out_of_stock').insert([payload]);
+                if (error && error.message && error.message.includes('image_url')) {
+                    delete payload.image_url;
+                    const res = await client.from('out_of_stock').insert([payload]);
+                    if (res.error) throw res.error;
+                } else if (error) {
+                    throw error;
+                }
 
                 if (error) throw error;
 
