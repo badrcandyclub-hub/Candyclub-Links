@@ -17,6 +17,21 @@ function getSupabase() {
 }
 
 // In-browser lightweight image compression
+
+// Egyptian phone normalization
+function normalizeEgyptianPhone(phone) {
+    if (!phone) return '';
+    let digits = String(phone).replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 1632));
+    digits = digits.replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 1776));
+    digits = digits.replace(/\D/g, '');
+    if (digits.startsWith('20') && digits.length === 12) {
+        digits = '0' + digits.substring(2);
+    } else if (digits.length === 10 && (digits.startsWith('10') || digits.startsWith('11') || digits.startsWith('12') || digits.startsWith('15'))) {
+        digits = '0' + digits;
+    }
+    return digits;
+}
+
 function compressImage(file, maxWidth = 450, maxHeight = 450, quality = 0.6) {
     return new Promise((resolve) => {
         if (!file || !file.type.startsWith('image/')) {
@@ -142,32 +157,43 @@ document.addEventListener('DOMContentLoaded', () => {
             if (errorBox) errorBox.style.display = 'none';
             if (successBox) successBox.style.display = 'none';
 
-            const prodName = document.getElementById('productName')?.value.trim();
-            const phone = document.getElementById('customerPhone')?.value.trim();
-            const custName = document.getElementById('customerName')?.value.trim() || 'عميل من صفحة الروابط';
+            const prodName = (document.getElementById('productName')?.value || '').trim();
+            const rawPhone = (document.getElementById('customerPhone')?.value || '').trim();
+            const cleanPhone = normalizeEgyptianPhone(rawPhone);
+            const custName = (document.getElementById('customerName')?.value || '').trim() || 'عميل من صفحة الروابط';
             const file = fileInput && fileInput.files && fileInput.files.length > 0 ? fileInput.files[0] : null;
 
-            if (!prodName || !phone) {
+            if (!prodName) {
                 if (errorBox) {
-                    errorBox.textContent = 'برجاء إدخال اسم المنتج ورقم الهاتف للتواصل.';
+                    errorBox.textContent = 'يرجى إدخال اسم المنتج أو الصنف الذي تبحث عنه.';
                     errorBox.style.display = 'block';
                 }
+                document.getElementById('productName')?.focus();
+                return;
+            }
+
+            if (!cleanPhone || cleanPhone.length < 11) {
+                if (errorBox) {
+                    errorBox.textContent = 'برجاء إدخال رقم موبايل صحيح (11 رقم) للتواصل معك فور توفر الصنف.';
+                    errorBox.style.display = 'block';
+                }
+                document.getElementById('customerPhone')?.focus();
                 return;
             }
 
             // Set Loading State
             submitBtn.disabled = true;
-            btnText.textContent = 'جاري الإرسال...';
+            btnText.textContent = 'جاري تسجيل طلبك...';
             if (submitSvg) submitSvg.style.display = 'none';
             
             try {
                 let imgDataUrl = null;
                 if (file) {
-                    btnText.textContent = 'جاري تجهيز الصورة...';
-                    imgDataUrl = await compressImage(file);
+                    btnText.textContent = 'جاري ضغط ومعالجة الصورة...';
+                    imgDataUrl = await compressImage(file, 600, 600, 0.65);
                 }
 
-                btnText.textContent = 'جاري تسجيل طلبك...';
+                btnText.textContent = 'جاري الإرسال للفرع...';
                 let finalReason = 'طلب من صفحة الروابط (Hub)';
                 if (imgDataUrl) {
                     finalReason += ' | [IMG:' + imgDataUrl + ']';
@@ -175,28 +201,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const client = getSupabase();
                 if (!client) {
-                    throw new Error('تعذر الاتصال بخدمة كاندي كلوب');
+                    throw new Error('تعذر الاتصال بقاعدة بيانات كاندي كلوب، يرجى المحاولة لاحقاً');
                 }
 
-                let payload = {
+                // إدراج مباشر في جدول out_of_stock
+                const payload = {
                     customer_name: custName,
-                    phone: phone,
+                    phone: cleanPhone,
                     product: prodName,
                     reason: finalReason
                 };
-                if (imgDataUrl) {
-                    payload.image_url = imgDataUrl;
-                }
 
-                let { data, error } = await client.from('out_of_stock').insert([payload]);
-                if (error && error.message && error.message.includes('image_url')) {
-                    delete payload.image_url;
-                    const res = await client.from('out_of_stock').insert([payload]);
-                    if (res.error) throw res.error;
-                } else if (error) {
-                    throw error;
-                }
-
+                const { data, error } = await client.from('out_of_stock').insert([payload]);
                 if (error) throw error;
 
                 // Success State
@@ -228,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnText.textContent = 'إعادة المحاولة';
                 if (submitSvg) submitSvg.style.display = 'inline-block';
                 if (errorBox) {
-                    errorBox.textContent = 'تعذر إرسال الطلب: ' + (err.message || 'يرجى التحقق من الاتصال بالإنترنت');
+                    errorBox.textContent = 'تعذر إرسال الطلب: ' + (err.message || 'يرجى التحقق من الاتصال بالإنترنت والمحاولة مجدداً');
                     errorBox.style.display = 'block';
                 }
             }
