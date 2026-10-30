@@ -150,17 +150,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (requestForm && submitBtn) {
         const btnText = submitBtn.querySelector('.btn-text');
         const submitSvg = submitBtn.querySelector('.submit-svg');
+        const prodInput = document.getElementById('productName');
+        const phoneInput = document.getElementById('customerPhone');
+        const nameInput = document.getElementById('customerName');
+
+        // Auto-remove error styling on input
+        [prodInput, phoneInput, nameInput].forEach(inp => {
+            if (inp) {
+                inp.addEventListener('input', () => {
+                    inp.classList.remove('input-error');
+                    if (errorBox && errorBox.style.display !== 'none') {
+                        errorBox.style.display = 'none';
+                    }
+                });
+            }
+        });
 
         requestForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             if (errorBox) errorBox.style.display = 'none';
             if (successBox) successBox.style.display = 'none';
+            [prodInput, phoneInput, nameInput].forEach(inp => inp && inp.classList.remove('input-error'));
 
-            const prodName = (document.getElementById('productName')?.value || '').trim();
-            const rawPhone = (document.getElementById('customerPhone')?.value || '').trim();
+            const prodName = (prodInput?.value || '').trim();
+            const rawPhone = (phoneInput?.value || '').trim();
             const cleanPhone = normalizeEgyptianPhone(rawPhone);
-            const custName = (document.getElementById('customerName')?.value || '').trim() || 'عميل من صفحة الروابط';
+            const custName = (nameInput?.value || '').trim();
             const file = fileInput && fileInput.files && fileInput.files.length > 0 ? fileInput.files[0] : null;
 
             if (!prodName) {
@@ -168,7 +184,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     errorBox.textContent = 'يرجى إدخال اسم المنتج أو الصنف الذي تبحث عنه.';
                     errorBox.style.display = 'block';
                 }
-                document.getElementById('productName')?.focus();
+                if (prodInput) {
+                    prodInput.classList.add('input-error');
+                    prodInput.focus();
+                }
                 return;
             }
 
@@ -177,7 +196,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     errorBox.textContent = 'برجاء إدخال رقم موبايل صحيح (11 رقم) للتواصل معك فور توفر الصنف.';
                     errorBox.style.display = 'block';
                 }
-                document.getElementById('customerPhone')?.focus();
+                if (phoneInput) {
+                    phoneInput.classList.add('input-error');
+                    phoneInput.focus();
+                }
+                return;
+            }
+
+            if (!custName || custName.length < 2) {
+                if (errorBox) {
+                    errorBox.textContent = 'يرجى إدخال اسمك الكريم للتواصل معك.';
+                    errorBox.style.display = 'block';
+                }
+                if (nameInput) {
+                    nameInput.classList.add('input-error');
+                    nameInput.focus();
+                }
                 return;
             }
 
