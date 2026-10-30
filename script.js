@@ -1,20 +1,9 @@
 /**
  * Candy Club Hub - Interactions & Form Handling
- * Connected to Candy Club Live System & Supabase
+ * Protected via Cloudflare Security Gateway (Zero-Key Architecture)
  */
 
-const SUPABASE_URL = 'https://thqccqwdwwxitvztmigt.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_BtFyuDBE_0PcF1z8JNskuA_-04mjcpc';
-let supabaseClient = null;
-
-function getSupabase() {
-    if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: { persistSession: false }
-        });
-    }
-    return supabaseClient;
-}
+const GATEWAY_URL = 'https://soft-sea-c9f7.badr-candyclub.workers.dev';
 
 // In-browser lightweight image compression
 
@@ -71,7 +60,6 @@ function compressImage(file, maxWidth = 450, maxHeight = 450, quality = 0.6) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    getSupabase();
     
     // ==========================================================================
     // Intelligent Dark Mode Auto-Switching & Toggle
@@ -233,12 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     finalReason += ' | [IMG:' + imgDataUrl + ']';
                 }
 
-                const client = getSupabase();
-                if (!client) {
-                    throw new Error('تعذر الاتصال بقاعدة بيانات كاندي كلوب، يرجى المحاولة لاحقاً');
-                }
-
-                // إدراج مباشر في جدول out_of_stock
+                // إرسال عبر البوابة السحابية الآمنة (Cloudflare Gateway)
                 const payload = {
                     customer_name: custName,
                     phone: cleanPhone,
@@ -246,8 +229,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     reason: finalReason
                 };
 
-                const { data, error } = await client.from('out_of_stock').insert([payload]);
-                if (error) throw error;
+                const response = await fetch(GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'تعذر تسجيل الطلب حالياً');
+                }
 
                 // Success State
                 submitBtn.classList.add('success');
@@ -278,8 +269,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnText.textContent = 'إعادة المحاولة';
                 if (submitSvg) submitSvg.style.display = 'inline-block';
                 if (errorBox) {
-                    errorBox.textContent = 'تعذر إرسال الطلب: ' + (err.message || 'يرجى التحقق من الاتصال بالإنترنت والمحاولة مجدداً');
+                    errorBox.textContent = err.message || 'تعذر إرسال الطلب: يرجى التحقق من الاتصال بالإنترنت والمحاولة مجدداً';
                     errorBox.style.display = 'block';
+                    errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             }
         });
