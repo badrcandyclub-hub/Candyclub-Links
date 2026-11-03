@@ -59,7 +59,34 @@ function compressImage(file, maxWidth = 450, maxHeight = 450, quality = 0.6) {
     });
 }
 
+function initHubVisitTracking() {
+    try {
+        let vid = localStorage.getItem('cc_hub_vid');
+        if (!vid) {
+            vid = 'v_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+            localStorage.setItem('cc_hub_vid', vid);
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        const lastPing = localStorage.getItem('cc_hub_last_ping');
+        if (lastPing === todayStr) {
+            return;
+        }
+
+        fetch(GATEWAY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'visit', visitor_id: vid })
+        }).then(res => {
+            if (res.ok) {
+                localStorage.setItem('cc_hub_last_ping', todayStr);
+            }
+        }).catch(() => {});
+    } catch (e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initHubVisitTracking();
     
     // ==========================================================================
     // Intelligent Dark Mode Auto-Switching & Toggle
